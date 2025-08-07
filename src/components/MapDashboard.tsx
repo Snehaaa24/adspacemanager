@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { 
   MapPin, 
   Filter, 
@@ -61,6 +62,7 @@ const mockHoardings = [
 ];
 
 const MapDashboard = () => {
+  const { toast } = useToast();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const [selectedHoarding, setSelectedHoarding] = useState<any>(null);
@@ -70,6 +72,34 @@ const MapDashboard = () => {
     showTrafficHeat: true,
     availableOnly: false
   });
+
+  const handleRecenter = () => {
+    toast({
+      title: "Map Recentered",
+      description: "View has been reset to show all locations",
+    });
+  };
+
+  const handleARPreview = () => {
+    toast({
+      title: "AR Preview",
+      description: "Opening augmented reality preview mode...",
+    });
+  };
+
+  const handleBooking = (hoarding: any) => {
+    if (hoarding.availability === 'Available') {
+      toast({
+        title: "Booking Started",
+        description: `Initiating booking process for ${hoarding.name}`,
+      });
+    } else {
+      toast({
+        title: "Location Details",
+        description: `Viewing details for ${hoarding.name}`,
+      });
+    }
+  };
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -238,11 +268,11 @@ const MapDashboard = () => {
         
         {/* Map Controls */}
         <div className="absolute top-4 right-4 space-y-2">
-          <Button variant="outline" size="sm" className="bg-background/80 backdrop-blur-sm">
+          <Button variant="outline" size="sm" className="bg-background/80 backdrop-blur-sm" onClick={handleRecenter}>
             <Navigation2 className="w-4 h-4 mr-2" />
             Recenter
           </Button>
-          <Button variant="outline" size="sm" className="bg-background/80 backdrop-blur-sm">
+          <Button variant="outline" size="sm" className="bg-background/80 backdrop-blur-sm" onClick={handleARPreview}>
             <Eye className="w-4 h-4 mr-2" />
             AR Preview
           </Button>
@@ -299,6 +329,7 @@ const MapDashboard = () => {
                 <Button 
                   className="bg-gradient-to-r from-primary to-primary-glow"
                   disabled={selectedHoarding.availability !== 'Available'}
+                  onClick={() => handleBooking(selectedHoarding)}
                 >
                   {selectedHoarding.availability === 'Available' ? 'Book Now' : 'View Details'}
                 </Button>
